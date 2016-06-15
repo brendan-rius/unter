@@ -4,5 +4,9 @@ services:
     image: 'redis'
   backend:
     build: .
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
     links:
       - redis
