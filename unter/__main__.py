@@ -1,8 +1,8 @@
 import os
 from threading import Thread
 
+import bottle
 import redis
-import time
 
 
 def redis_from_env():
@@ -43,15 +43,44 @@ def listen(pubsub):
             print('Received: {}'.format(item['data']))
 
 
+class Publisher:
+    """
+    In charge of publishing messages to Redis
+    """
+
+    """
+    The channel the publisher sends data to
+    """
+    Channel = 'test'
+
+    def __init__(self, redis):
+        self._redis = redis
+
+    def publish(self):
+        """
+        Publish the json parsable content of the request to the Redis channel and return it
+        """
+        from bottle import request
+        json = request.json
+        self._redis.publish(self.Channel, json)
+        return json
+
+    def run(self):
+        """
+        Run the webserver (blocking)
+        """
+        bottle.post('/publish')(self.publish)
+        bottle.run(host='0.0.0.0', port=8080)
+
+
 if __name__ == '__main__':
     r = redis_from_env()
-    pubsub = r.pubsub()
-    pubsub.subscribe('test')
-    print('Listening to channel')
 
+    publisher = Publisher(r)
+
+    pubsub = r.pubsub()
+    pubsub.subscribe(publisher.Channel)
     thread = Thread(target=listen, args=(pubsub,))
     thread.start()
-    for i in range(10):
-        print("Publish")
-        r.publish('test', i)
-        time.sleep(1)
+
+    publisher.run()
