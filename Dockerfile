@@ -9,4 +9,5 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD ["python", "unter"]
+# -u stand for unbuffered output
+CMD ["python", "-u", "unter"]
