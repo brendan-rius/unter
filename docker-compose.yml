@@ -4,8 +4,6 @@ services:
     build: backend
     ports:
       - "3000:3000"
-    links:
-      - redis
   frontend:
     build: frontend
     ports:
