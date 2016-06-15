@@ -1,0 +1,23 @@
+{
+  "name": "unter",
+  "version": "1.0.0",
+  "description": "Uber as a service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brendan-rius/unter.git"
+  },
+  "keywords": [
+    "uber"
+  ],
+  "author": "Brendan Rius",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brendan-rius/unter/issues"
+  },
+  "homepage": "https://github.com/brendan-rius/unter#readme"
+}

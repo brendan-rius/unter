@@ -1,13 +1,12 @@
-FROM python:3.5
+FROM node
 
 RUN mkdir /app
 WORKDIR /app
 
-# We launch pip install only if the requirements have changed
-COPY requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+# We launch npm install only if the requirements have changed
+COPY package.json package.json
+RUN npm install
 
 COPY . .
 
-# -u stand for unbuffered output
-CMD ["python", "-u", "unter"]
+CMD ["npm", "start"]
