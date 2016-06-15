@@ -1,5 +1,6 @@
+import json
 import os
-from threading import Thread
+import pprint
 
 import bottle
 import redis
@@ -32,55 +33,55 @@ def redis_from_env():
     return redis.StrictRedis(**config)
 
 
-def listen(pubsub):
-    """
-    Listen to a pubsub object and writes the received data.
-    This is blocking.
-    :param pubsub: the Redis pubsub object
-    """
-    while True:
-        for item in pubsub.listen():
-            print('Received: {}'.format(item['data']))
-
-
-class Publisher:
+class Dispatcher:
     """
     In charge of publishing messages to Redis
     """
 
     """
-    The channel the publisher sends data to
+    The channel that gets populated with clients' requests
     """
-    Channel = 'test'
+    RequestsChannel = 'clients'
+    ProvidersChannel = 'providers'
 
     def __init__(self, redis):
         self._redis = redis
+        self._pubsub = self._redis.pubsub()
+        self._pubsub.subscribe(self.Channel)
 
-    def publish(self):
+    def post(self):
         """
         Publish the json parsable content of the request to the Redis channel and return it
         """
         from bottle import request
-        json = request.json
-        self._redis.publish(self.Channel, json)
-        return json
+        data = request.json
+        self._redis.publish(self.Channel, json.dumps(data))
+        return data
+
+    def get(self):
+        messages = []
+        while True:
+            message = self._pubsub.get_message()
+            if message is None:
+                break
+            else:
+                pprint.pprint(message)
+                print(message['data'])
+                messages.append(json.loads(message['data'].decode('utf-8')))
+
+        return {'messages': messages}
 
     def run(self):
         """
         Run the webserver (blocking)
         """
-        bottle.post('/publish')(self.publish)
+        bottle.post('/data')(self.post)
+        bottle.get('/data')(self.get)
         bottle.run(host='0.0.0.0', port=8080)
 
 
 if __name__ == '__main__':
     r = redis_from_env()
 
-    publisher = Publisher(r)
-
-    pubsub = r.pubsub()
-    pubsub.subscribe(publisher.Channel)
-    thread = Thread(target=listen, args=(pubsub,))
-    thread.start()
-
+    publisher = Dispatcher(r)
     publisher.run()
