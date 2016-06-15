@@ -3,12 +3,16 @@ services:
   redis:
     image: 'redis'
   backend:
-    build: .
+    build: backend
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_DB=0
     ports:
-      - "8080:8080"
+      - "3000:3000"
     links:
       - redis
+  frontend:
+    build: frontend
+    ports:
+      - "8080:80"
