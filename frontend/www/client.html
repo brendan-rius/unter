@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client</title>
+    <script src="js/socket.io-1.4.5.js"></script>
+    <script src="js/jquery.min.js"></script>
+</head>
+<body>
+<form id="request-form">
+    <input type="text" id="name" placeholder="Your name">
+    <input type="submit" value="Request">
+</form>
+<script>
+    $(document).ready(function () {
+        var nameInput = $('#name');
+
+        var socket = io('127.0.0.1:3000');
+        socket.emit('identify', 'clifent');
+        $("#request-form").on('submit', function (event) {
+            var name = nameInput.val();
+            event.preventDefault();
+            socket.emit('request', name);
+        })
+    });
+</script>
+</body>
+</html>
