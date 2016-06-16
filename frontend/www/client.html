@@ -5,6 +5,7 @@
     <title>Client</title>
     <script src="js/socket.io-1.4.5.js"></script>
     <script src="js/jquery.min.js"></script>
+    <script src="js/unter.js"></script>
 </head>
 <body>
 <form id="request-form">
@@ -15,12 +16,12 @@
     $(document).ready(function () {
         var nameInput = $('#name');
 
-        var socket = io('127.0.0.1:3000');
-        socket.emit('identify', 'clifent');
+        var u = new Unter();
+        u.identify('client');
         $("#request-form").on('submit', function (event) {
             var name = nameInput.val();
             event.preventDefault();
-            socket.emit('request', name);
+            u.request(name);
         })
     });
 </script>

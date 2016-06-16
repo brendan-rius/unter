@@ -2,9 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Client</title>
+    <script src="js/socket.io-1.4.5.js"></script>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/unter.js"></script>
 </head>
 <body>
-$END$
+<form id="request-form">
+    <input type="text" id="name" placeholder="Your provider's name">
+    <input type="submit" value="I am available">
+</form>
+<script>
+    $(document).ready(function () {
+        var nameInput = $('#name');
+
+        var u = new Unter();
+        u.identify('provider');
+        $("#request-form").on('submit', function (event) {
+            var name = nameInput.val();
+            event.preventDefault();
+            u.available(name);
+        })
+    });
+</script>
 </body>
 </html>
