@@ -6,7 +6,5 @@ services:
       - "3000:3000"
   frontend:
     build: frontend
-    volumes:
-      - ./www:/usr/share/nginx/html:ro
     ports:
       - "8080:80"
