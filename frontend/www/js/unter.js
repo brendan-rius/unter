@@ -2,23 +2,35 @@ class Unter {
     constructor() {
         this.socket = io('127.0.0.1:3000');
     }
+}
 
-    identify(role) {
-        this.role = role.toLowerCase();
-        this.socket.emit('identify', this.role);
+class Provider extends Unter {
+    constructor() {
+        super();
+        this.socket.emit('identify', 'provider');
+        navigator.geolocation.watchPosition(this.updateLocation.bind(this));
     }
 
-    request(data) {
-        if (this.role !== 'client') {
-            throw new Error("You must be a client to request something");
-        }
-        this.socket.emit('request', data);
-    };
+    updateLocation(location) {
+        console.log(location);
+        this.socket.emit('updateLocation', location);
+    }
 
     available(data) {
-        if (this.role !== 'provider') {
-            throw new Error("You must be a provider to provide something");
-        }
         this.socket.emit('available', data);
+    };
+}
+
+class Client extends Unter {
+    constructor() {
+        super();
+        this.socket.emit('identify', 'client');
+    }
+
+    request() {
+        navigator.geolocation.getCurrentPosition(location => {
+            console.log(location);
+            this.socket.emit('request', location);
+        });
     };
 }

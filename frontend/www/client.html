@@ -8,21 +8,13 @@
     <script src="js/unter.js"></script>
 </head>
 <body>
-<form id="request-form">
-    <input type="text" id="name" placeholder="Your name">
-    <input type="submit" value="Request">
-</form>
+<button id="request-button">Request</button>
 <script>
     $(document).ready(function () {
-        var nameInput = $('#name');
-
-        var u = new Unter();
-        u.identify('client');
-        $("#request-form").on('submit', function (event) {
-            var name = nameInput.val();
-            event.preventDefault();
-            u.request(name);
-        })
+        var c = new Client();
+        $("#request-button").on('click', function () {
+            c.request();
+        });
     });
 </script>
 </body>
