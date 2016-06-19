@@ -6,6 +6,17 @@ class Client {
     constructor(id, socket) {
         this.id = id;
         this.socket = socket;
+        this.serviceWanted = false;
+        this.position = null;
+    }
+
+    wants(position) {
+        this.serviceWanted = true;
+        this.position = position;
+    }
+
+    cancel() {
+        this.serviceWanted = false;
     }
 }
 
@@ -13,6 +24,8 @@ class Provider {
     constructor(id, socket) {
         this.id = id;
         this.socket = socket;
+        this.position = null;
+        this.available = false;
     }
 }
 
@@ -25,16 +38,28 @@ class Dispatcher {
     newClient(socket) {
         let client = new Client(this.clients.length, socket);
         this.clients.push(client);
-        socket.on('request', request => {
-            console.log(`Client ${client.id} requested "${request}"`);
+        socket.on('request', position => {
+            console.log(`Client ${client.id} at "${position}"`);
+            client.wants(position);
+            this.dispatch(client);
         });
+    }
+
+    dispatch(client) {
+        let availableProviders = this.providers.filter(provider => provider.available);
+        console.log(`${availableProviders.length} providers are available`);
     }
 
     newProvider(socket) {
         let provider = new Provider(this.providers.length, socket);
         this.providers.push(provider);
+        socket.on('updateLocation', location => {
+            console.log(`Provider ${provider.id} is at ${location}`);
+            provider.location = location;
+        });
         socket.on('available', () => {
             console.log(`Provider ${provider.id} is available`);
+            provider.available = true;
         });
     }
 }
